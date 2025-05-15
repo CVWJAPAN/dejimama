@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタルママ友コミュニティ - マッチング機能V2</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#fff5f5;margin:0;padding:20px;text-align:center}
+        #welcome-screen,#community-container{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);text-align:left}
+        #community-container{display:none}
+        h1{color:#c71585;font-size:24px;margin-bottom:10px}
+        h2{color:#c71585;font-size:18px;margin-top:20px;border-bottom:1px solid #ffe4e1;padding-bottom:5px}
+        h3{color:#ff69b4;font-size:16px;margin-top:10px}
+        p,li{font-size:14px;color:#333;line-height:1.5}
+        .button{background:#ff69b4;color:#fff;padding:10px 20px;border:none;border-radius:10px;cursor:pointer;font-size:14px;margin:10px 0}
+        .button:hover{background:#ff4f9a}
+        #match-results{border:1px solid #e0e0e0;border-radius:10px;padding:15px;height:150px;overflow-y:scroll;background:#f9f9f9;margin-bottom:15px}
+        .match-item{margin:8px 0;padding:8px;border-radius:8px;font-size:13px;background:#fff0f5}
+        .match-item span{color:#ff69b4;font-size:12px}
+        #match-form{display:none;background:#f9f9f9;padding:15px;border-radius:10px;margin-top:10px;border-left:3px solid #ff69b4}
+        .match-section{margin-bottom:10px}
+        select, input[type="text"]{width:calc(100% - 20px);padding:8px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px}
+    </style>
+</head>
+<body>
+    <div id="welcome-screen">
+        <h1>デジタルママ友コミュニティ - マッチング機能V2</h1>
+        <p>子育て中のママが共通の興味で繋がれるよ！マッチング機能を試してみてね。</p>
+        <p><strong>注意:</strong> 個人情報は入力しないでね。安全に楽しもう。</p>
+        <button class="button" onclick="startCommunity()">コミュニティに参加</button>
+    </div>
+    <div id="community-container">
+        <h1>デジタルママ友コミュニティ</h1>
+        <h2>ママ友マッチング</h2>
+        <button class="button" onclick="showMatchForm()">マッチングを開始</button>
+        <div id="match-form">
+            <h3>ママ友マッチングフォーム</h3>
+            <div class="match-section">
+                <label>子供の年齢:</label>
+                <select id="age">
+                    <option value="0-2">0-2歳</option>
+                    <option value="3-5">3-5歳</option>
+                    <option value="6-8">6-8歳</option>
+                    <option value="9-12">9-12歳</option>
+                </select>
+            </div>
+            <div class="match-section">
+                <label>興味:</label>
+                <input type="text" id="interest" placeholder="例: 公園遊び、絵本、習い事">
+            </div>
+            <button class="button" onclick="findMatch()">マッチングを検索</button>
+        </div>
+        <div id="match-results"></div>
+    </div>
+
+    <script>
+        function startCommunity(){document.getElementById("welcome-screen").style.display="none";document.getElementById("community-container").style.display="block"}
+        function showMatchForm(){document.getElementById("match-form").style.display="block"}
+        function findMatch(){
+            const age = document.getElementById("age").value;
+            const interest = document.getElementById("interest").value.toLowerCase();
+            const results = document.getElementById("match-results");
+            results.innerHTML = "";
+            
+            const mamas = [
+                {age: "3-5", interest: "公園遊び", name: "あいこ", message: "一緒に遊びませんか？"},
+                {age: "6-8", interest: "料理", name: "みき", message: "料理仲間募集！"},
+                {age: "3-5", interest: "絵本", name: "さくら", message: "絵本好きです！"},
+                {age: "0-2", interest: "お昼寝", name: "はな", message: "お昼寝のコツをシェアしたい！"}
+            ];
+
+            const matches = mamas.filter(mama => mama.age === age && (interest === "" || mama.interest.includes(interest)));
+            matches.sort((a, b) => {
+                const matchA = a.interest === interest ? 1 : 0;
+                const matchB = b.interest === interest ? 1 : 0;
+                return matchB - matchA;
+            });
+
+            if (matches.length === 0) {
+                const noMatch = document.createElement("div");
+                noMatch.className = "match-item";
+                noMatch.innerText = "見つからなかったよ…興味を変えてみるか、コミュニティで募集してみて！";
+                results.appendChild(noMatch);
+            } else {
+                matches.forEach(mama => {
+                    const matchItem = document.createElement("div");
+                    matchItem.className = "match-item";
+                    const matchLevel = mama.interest === interest ? "完全一致" : "部分一致";
+                    matchItem.innerHTML = `${mama.name}: ${mama.message} (年齢: ${mama.age}, 興味: ${mama.interest}) <span>一致度: ${matchLevel}</span><br><button class="button" style="font-size:12px;padding:5px 10px;margin-top:5px;">メッセージを送る</button>`;
+                    results.appendChild(matchItem);
+                });
+            }
+            results.style.display = "block";
+        }
+    </script>
+</body>
+</html>
